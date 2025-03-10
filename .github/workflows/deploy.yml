@@ -51,17 +51,17 @@ jobs:
             docker service ls | grep -q saas-backend
             if [ $? -eq 0 ]; then
               docker service update \
-                --env-add JWT_SECRET="$JWT_SECRET" \
-                --env-add ENTERPRISES_DB_URL="$ENTERPRISES_DB_URL" \
-                --env-add ULLER_DB_URL="$ULLER_DB_URL" \
-                --env-add ULLER_DB_NAME="$ULLER_DB_NAME" \
+                --env-add JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+                --env-add ENTERPRISES_DB_URL="${{ secrets.ENTERPRISES_DB_URL }}" \
+                --env-add ULLER_DB_URL="${{ secrets.ULLER_DB_URL }}" \
+                --env-add ULLER_DB_NAME="${{ secrets.ULLER_DB_NAME }}" \
                 --image bethecozmo/saas-backend:latest saas-backend
             else
               docker service create --name saas-backend \
                 -p 8080:8080 \
-                -e JWT_SECRET="$JWT_SECRET" \
-                -e ENTERPRISES_DB_URL="$ENTERPRISES_DB_URL" \
-                -e ULLER_DB_URL="$ULLER_DB_URL" \
-                -e ULLER_DB_NAME="$ULLER_DB_NAME" \
+                -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+                -e ENTERPRISES_DB_URL="${{ secrets.ENTERPRISES_DB_URL }}" \
+                -e ULLER_DB_URL="${{ secrets.ULLER_DB_URL }}" \
+                -e ULLER_DB_NAME="${{ secrets.ULLER_DB_NAME }}" \
                 bethecozmo/saas-backend:latest
             fi
