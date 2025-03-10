@@ -37,17 +37,19 @@ jobs:
           ENTERPRISES_DB_URL: ${{ secrets.ENTERPRISES_DB_URL }}
           ULLER_DB_URL: ${{ secrets.ULLER_DB_URL }}
           ULLER_DB_NAME: ${{ secrets.ULLER_DB_NAME }}
-        run: |
-          sudo apt-get install -y sshpass
-          # Realiza a conexão SSH usando sshpass e senha
-          sshpass -p "$DEPLOY_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER << 'EOF'
-            # Garante que o Swarm está ativo (se não estiver, o pipeline falha)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_SERVER }}
+          username: ${{ secrets.DEPLOY_USER }}
+          password: ${{ secrets.DEPLOY_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            echo "Deploying to Swarm 🚀🚀🚀!"
+            
             docker info --format '{{.Swarm.LocalNodeState}}' | grep -q "active" || exit 1
 
-            # Verifica se o serviço 'saas-backend' já existe
             docker service ls | grep -q saas-backend
             if [ $? -eq 0 ]; then
-              # Se o serviço existir, faz o update da imagem
               docker service update \
                 --env-add JWT_SECRET="$JWT_SECRET" \
                 --env-add ENTERPRISES_DB_URL="$ENTERPRISES_DB_URL" \
@@ -55,7 +57,6 @@ jobs:
                 --env-add ULLER_DB_NAME="$ULLER_DB_NAME" \
                 --image bethecozmo/saas-backend:latest saas-backend
             else
-              # Se o serviço não existir, cria o serviço
               docker service create --name saas-backend \
                 -p 8080:8080 \
                 -e JWT_SECRET="$JWT_SECRET" \
@@ -64,4 +65,3 @@ jobs:
                 -e ULLER_DB_NAME="$ULLER_DB_NAME" \
                 bethecozmo/saas-backend:latest
             fi
-          EOF
