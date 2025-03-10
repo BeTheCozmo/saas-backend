@@ -2,8 +2,6 @@ module uller
 
 go 1.22.2
 
-replace uller => ./src
-
 require go.mongodb.org/mongo-driver v1.17.2
 
 require (
