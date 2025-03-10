@@ -31,12 +31,13 @@ jobs:
         env:
           DEPLOY_SERVER: ${{ secrets.DEPLOY_SERVER }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         run: |
-          echo "$SSH_PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -i private_key.pem -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER << 'EOF'
+          sudo apt-get install -y sshpass
+
+          # Realiza a conexão SSH usando sshpass e senha
+          sshpass -p "$DEPLOY_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER << 'EOF'
             # Garante que o Swarm está ativo (se não estiver, o pipeline falha)
             docker info --format '{{.Swarm.LocalNodeState}}' | grep -q "active" || exit 1
             # Cria ou atualiza o serviço
@@ -44,4 +45,3 @@ jobs:
               docker service create --name saas-backend -p 8080:8080 $DOCKER_USERNAME/saas-backend:latest
             docker service update --image $DOCKER_USERNAME/saas-backend:latest saas-backend
           EOF
-          rm private_key.pem
