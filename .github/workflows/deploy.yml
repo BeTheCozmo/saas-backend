@@ -3,11 +3,13 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Deploy só na main
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
