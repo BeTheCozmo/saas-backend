@@ -1,9 +1,9 @@
 package main
 
-import uller "uller/src"
+import manager "uller/src"
 
 func main() {
-  manager := uller.New()
+  manager := manager.New()
   manager.CreateModules()
   manager.ConfigureModules()
   manager.Run()
