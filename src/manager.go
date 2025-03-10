@@ -72,6 +72,7 @@ func (u *Manager) ConfigureModules() {
   }
   
   enterpriseDSN := os.Getenv("ENTERPRISES_DB_URL")
+  u.Logger.Debug(enterpriseDSN)
   enterpriseClient, err := gorm.Open(mysql.Open(enterpriseDSN), &gorm.Config{
     Logger: gormlogger.Default.LogMode(gormlogger.Info),
   })
