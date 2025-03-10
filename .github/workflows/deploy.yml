@@ -25,12 +25,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker buildx build --platform linux/amd64 \
-            --build-arg JWT_SECRET="${{ secrets.JWT_SECRET }}" \
-            --build-arg ENTERPRISES_DB_URL="${{ secrets.ENTERPRISES_DB_URL }}" \
-            --build-arg ULLER_DB_URL="${{ secrets.ULLER_DB_URL }}" \
-            --build-arg ULLER_DB_NAME="${{ secrets.ULLER_DB_NAME }}" \
-            -t bethecozmo/saas-backend:latest --push .
+          docker buildx build --platform linux/amd64 -t bethecozmo/saas-backend:latest --push .
 
       - name: Deploy to Swarm
         env:
@@ -49,9 +44,21 @@ jobs:
             docker service ls | grep -q saas-backend
             if [ $? -eq 0 ]; then
               # Se o serviço existir, faz o update da imagem
-              docker service update --image bethecozmo/saas-backend:latest saas-backend
+              docker service update \
+                --env-add JWT_SECRET='${{ secrets.JWT_SECRET }}' \
+                --env-add ENTERPRISES_DB_URL='${{ secrets.ENTERPRISES_DB_URL }}' \
+                --env-add ULLER_DB_URL='${{ secrets.ULLER_DB_URL }}' \
+                --env-add ULLER_DB_NAME='${{ secrets.ULLER_DB_NAME }}' \
+              
+                --image bethecozmo/saas-backend:latest saas-backend
             else
               # Se o serviço não existir, cria o serviço
-              docker service create --name saas-backend -p 8080:8080 bethecozmo/saas-backend:latest
+              docker service create --name saas-backend \
+                -p 8080:8080 \
+                -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
+                -e ENTERPRISES_DB_URL='${{ secrets.ENTERPRISES_DB_URL }}' \
+                -e ULLER_DB_URL='${{ secrets.ULLER_DB_URL }}' \
+                -e ULLER_DB_NAME='${{ secrets.ULLER_DB_NAME }}' \
+                bethecozmo/saas-backend:latest
             fi
           EOF
