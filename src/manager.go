@@ -66,6 +66,7 @@ func (u *Manager) CreateModules() {
 }
 func (u *Manager) ConfigureModules() {
   err := godotenv.Load()
+  u.Logger.Configure()
   if err != nil {
     u.Logger.Error("error loading .env")
   }
@@ -98,7 +99,6 @@ func (u *Manager) ConfigureModules() {
   }
   router := gin.Default()
 
-  u.Logger.Configure()
   u.Management.Configure()
   u.PermissionManager.Configure()
   u.EnterpriseStorage.Configure(enterpriseClient)
