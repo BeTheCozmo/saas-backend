@@ -67,7 +67,7 @@ func (u *Manager) CreateModules() {
 func (u *Manager) ConfigureModules() {
   err := godotenv.Load()
   if err != nil {
-    panic("error loading .env")
+    u.Logger.Error("error loading .env")
   }
   
   enterpriseDSN := os.Getenv("ENTERPRISES_DB_URL")

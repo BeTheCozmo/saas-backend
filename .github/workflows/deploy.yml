@@ -25,7 +25,12 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker buildx build --platform linux/amd64 -t $DOCKER_USERNAME/saas-backend:latest --push .
+          docker buildx build --platform linux/amd64 \
+            --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --build-arg ENTERPRISES_DB_URL=${{ secrets.ENTERPRISES_DB_URL }} \
+            --build-arg ULLER_DB_URL=${{ secrets.ULLER_DB_URL }} \
+            --build-arg ULLER_DB_NAME=${{ secrets.ULLER_DB_NAME }} \
+            -t bethecozmo/saas-backend:latest --push .
 
       - name: Deploy to Swarm
         env:
@@ -33,24 +38,12 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          ENTERPRISES_DB_URL: ${{ secrets.ENTERPRISES_DB_URL }}
-          ULLER_DB_URL: ${{ secrets.ULLER_DB_URL }}
-          ULLER_DB_NAME: ${{ secrets.ULLER_DB_NAME }}
         run: |
           sudo apt-get install -y sshpass
           # Realiza a conexão SSH usando sshpass e senha
           sshpass -p "$DEPLOY_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_SERVER << 'EOF'
             # Garante que o Swarm está ativo (se não estiver, o pipeline falha)
             docker info --format '{{.Swarm.LocalNodeState}}' | grep -q "active" || exit 1
-
-            # Cria o arquivo .env no servidor
-            echo "JWT_SECRET=$JWT_SECRET" > /app/.env
-            echo "ENTERPRISES_DB_URL=$ENTERPRISES_DB_URL" >> /app/.env
-            echo "ULLER_DB_URL=$ULLER_DB_URL" >> /app/.env
-            echo "ULLER_DB_NAME=$ULLER_DB_NAME" >> /app/.env
-            # Adicione outras variáveis conforme necessário
-
 
             # Verifica se o serviço 'saas-backend' já existe
             docker service ls | grep -q saas-backend
