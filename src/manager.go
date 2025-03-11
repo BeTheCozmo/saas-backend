@@ -77,12 +77,12 @@ func (u *Manager) ConfigureModules() {
     Logger: gormlogger.Default.LogMode(gormlogger.Info),
   })
   if err != nil {
-    panic(err)
+    u.Logger.Debug(err)
   }
   
   ullerDSN := os.Getenv("ULLER_DB_URL")
   if ullerDSN == "" {
-    panic("uller dsn is empty")
+    u.Logger.Debug("uller dsn is empty")
   }
   ullerDBName := os.Getenv("ULLER_DB_NAME")
   if ullerDBName == "" {
@@ -91,13 +91,14 @@ func (u *Manager) ConfigureModules() {
 
   ullerClient, err := mongo.Connect(options.Client().ApplyURI(ullerDSN))
   if err != nil {
-    panic(err)
+    u.Logger.Debug(err)
   }
   
   jwtSecret := os.Getenv("JWT_SECRET")
   if jwtSecret == "" {
     jwtSecret = "53ArF`*U7/viV!xr"
   }
+  u.Logger.Debug("jwt secret:", jwtSecret)
   router := gin.Default()
 
   u.Management.Configure()
