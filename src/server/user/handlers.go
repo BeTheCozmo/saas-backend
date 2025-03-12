@@ -13,19 +13,19 @@ func (ur *UserRoutes) createUserHandler(c *gin.Context) {
   var user u.User
   err := c.ShouldBindBodyWithJSON(&user)
   if err != nil {
-    c.AbortWithError(http.StatusInternalServerError, err)
+    c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
   }
   
   token, err := ur.um.CreateUser(&user)
   if err != nil {
-    c.AbortWithError(http.StatusUnauthorized, err)
+    c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
     return
   }
 
   c.Header("Authorization", fmt.Sprintf("Bearer %v", token))
   c.Header("Content-Type", "application/json")
 
-  c.JSON(http.StatusCreated, map[string]string{
+  c.AbortWithStatusJSON(http.StatusCreated, map[string]string{
     "token": token,
   })
 }
