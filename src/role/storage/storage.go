@@ -245,6 +245,11 @@ func (rs *RoleStorage) EnsureAdminRoleCreated() {
           RemainingUses: 0,
         },
         {
+          Name: "ent_search_partners",
+          IsLimited: false,
+          RemainingUses: 0,
+        },
+        {
           Name: "ent_get_details",
           IsLimited: false,
           RemainingUses: 0,
