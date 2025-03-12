@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net/http"
 	er "uller/src/server/enterprise"
 	ur "uller/src/server/user"
 
@@ -9,6 +10,7 @@ import (
 )
 
 type Server struct {
+  server *http.Server
   engine *gin.Engine
   ur *ur.UserRoutes
   er *er.EnterpriseRoutes
@@ -23,6 +25,13 @@ func (s *Server) Configure(router *gin.Engine, ur *ur.UserRoutes, er *er.Enterpr
   s.ur = ur
   s.er = er
   s.configureRoutes()
+
+  s.server = &http.Server{
+    Handler: s.engine,
+    ReadTimeout: 0,
+    WriteTimeout: 0,
+    IdleTimeout: 0,
+  }
 }
 
 func (s *Server) configureRoutes() {
@@ -32,5 +41,8 @@ func (s *Server) configureRoutes() {
 }
 
 func (s *Server) Start(port string) {
-  s.engine.Run(port)
+  s.server.Addr = port
+  if err := s.server.ListenAndServe(); err != nil {
+    panic(err)
+  }
 }

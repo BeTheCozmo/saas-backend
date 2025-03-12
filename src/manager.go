@@ -97,7 +97,6 @@ func (u *Manager) ConfigureModules() {
   if jwtSecret == "" {
     jwtSecret = "53ArF`*U7/viV!xr"
   }
-  u.Logger.Debug("jwt secret:", jwtSecret)
   router := gin.Default()
 
   u.Management.Configure()
