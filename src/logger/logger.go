@@ -33,7 +33,7 @@ func (l *Logger) Configure() {
   if err != nil {
     panic(err)
   }
-  l.err = log.New(errFile, Red+"[ERROR] ", log.Ldate | log.Ltime)
+  l.err = log.New(errFile, Red+"[ERROR] "+Reset, log.Ldate | log.Ltime)
 }
 
 func (l *Logger) Info(args ...any) {
