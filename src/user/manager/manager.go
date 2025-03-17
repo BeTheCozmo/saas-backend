@@ -116,6 +116,29 @@ func (um *UserManager) GetByCredential(credential string) (*user.User, error) {
   return user, nil
 }
 
+func (um *UserManager) GetByCredentials(email, phone string) *user.User {
+  user, _ := um.GetByCredential(email)
+  if user != nil {
+    return user
+  }
+
+  user, _ = um.GetByCredential(phone)
+  if user != nil {
+    return user
+  }
+  return nil
+}
+
+
+func (um *UserManager) alreadyIssetUser(user *user.User) bool {
+  searchedUser := um.GetByCredentials(user.Email, user.Phone)
+  if searchedUser == nil {
+    return false
+  } else {
+    return true
+  }
+}
+
 func (um *UserManager) CreateUser(userData *user.User) (string, error) {
   if (userData.Email == "") && (userData.Phone == "") {
     return "", errors.New("email or phone don't provided")
@@ -125,6 +148,10 @@ func (um *UserManager) CreateUser(userData *user.User) (string, error) {
     return "", err
   }
   userData.Password = hashedPassword
+
+  if um.alreadyIssetUser(userData) {
+    return "", fmt.Errorf("user with that credential already exists")
+  }
 
   userPermissions := um.getBasePermissions()
   userRole := um.rm.GetUserRole()
@@ -145,7 +172,7 @@ func (um *UserManager) CreateUser(userData *user.User) (string, error) {
 
   token, err := um.a.GetAuthorizationToken(createdUser)
   if err != nil {
-    fmt.Println("Error with authorization token", err)
+    um.logger.Error("Error with authorization token", err)
     return "", err
   }
 

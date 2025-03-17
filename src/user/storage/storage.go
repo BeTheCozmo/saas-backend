@@ -46,10 +46,6 @@ func (us *UserStorage) ensureIndexes() {
       Keys: bson.M{"email": 1},
       Options: options.Index().SetUnique(true),
     },
-    {
-      Keys: bson.M{"phone": 1},
-      Options: options.Index().SetUnique(true),
-    },
   }
 
   _, err := us.collection.Indexes().CreateMany(ctx, indexModel)
