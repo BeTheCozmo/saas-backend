@@ -268,6 +268,11 @@ func (um *UserManager) getBasePermissions() []*p.Permission {
       IsLimited: false,
       RemainingUses: 0,
     },
+    {
+      Name: "ent_get_createdAt",
+      IsLimited: false,
+      RemainingUses: 0,
+    },
   }
 }
 
@@ -298,43 +303,49 @@ func (um *UserManager) UsePermissions(user *user.User, usedPermissions []string)
 }
 
 func (um *UserManager) usePermission(user *user.User, usedPermission string) error {
-  used, err := um.usePermissionForPermissions(usedPermission, &user.Plan.Permissions)
+  var errors []error
+  used, brokenPlan, err := um.usePermissionForPermissions(usedPermission, &user.Plan.Permissions)
   if err != nil {
-    return err
+    errors = append(errors, err)
   } else if used {
     return nil
   }
-  used, err = um.usePermissionForPermissions(usedPermission, &user.Role.Permissions)
+  used, brokenRole, err := um.usePermissionForPermissions(usedPermission, &user.Role.Permissions)
   if err != nil {
-    return err
+    errors = append(errors, err)
   } else if used {
     return nil
   }
-  used, err = um.usePermissionForPermissions(usedPermission, &user.Permissions)
+  used, brokenUser, err := um.usePermissionForPermissions(usedPermission, &user.Permissions)
   if err != nil {
-    return err
+    errors = append(errors, err)
   } else if used {
     return nil
+  }
+
+  if brokenPlan && brokenRole && brokenUser {
+    return fmt.Errorf(errors[0].Error(), errors[1].Error(), errors[2].Error())
   }
   
   return nil
 }
 
-func (um *UserManager) usePermissionForPermissions(usedPermission string, permissions *[]*p.Permission) (bool, error) {
+func (um *UserManager) usePermissionForPermissions(usedPermission string, permissions *[]*p.Permission) (bool, bool, error) {
   for _, permission := range *permissions {
-    if permission.Name == usedPermission {
-      if !permission.IsLimited {
-        return false, nil
-      }
-      if permission.RemainingUses == 0 {
-        errorMessage := fmt.Sprintf("you dont have permission to use '%v' permission", permission)
-        return false, errors.New(errorMessage)
-      }
-      permission.RemainingUses = permission.RemainingUses - 1
-      return true, nil
+    if permission.Name != usedPermission {
+      continue
     }
+    if !permission.IsLimited {
+      return false, false, nil
+    }
+    if permission.RemainingUses == 0 && permission.IsLimited {
+      errorMessage := fmt.Sprintf("you dont have permission to use '%v' permission", permission)
+      return false, true, errors.New(errorMessage)
+    }
+    permission.RemainingUses = permission.RemainingUses - 1
+    return true, false, nil
   }
-  return false, nil
+  return false, false, nil
 }
 
 func (um *UserManager) SaveUser(user *user.User) error {

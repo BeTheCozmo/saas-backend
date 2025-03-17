@@ -1,5 +1,7 @@
 package enterprise
 
+import "time"
+
 type EnterpriseStatus string
 const (
   ACTIVE EnterpriseStatus = "ACTIVE"
@@ -31,7 +33,7 @@ type Enterprise struct {
   Mei bool `gorm:"column:mei" json:"mei"`
   BranchOffice EnterpriseBranchOffice `gorm:"column:branchOffice" json:"branchOffice"`
   Debt float64 `gorm:"column:debt" json:"debt"`
-  // CreatedAt time.Time `gorm:"column:createdAt" json:"createdAt"`
+  CreatedAt time.Time `gorm:"column:createdAt" json:"createdAt"`
   FantasyName string `gorm:"column:fantasyName" json:"fantasyName"`
   Name string `gorm:"column:name" json:"name"`
   Enriched bool `gorm:"column:enriched" json:"enriched"`
@@ -65,7 +67,7 @@ type EnterpriseBase struct {
   SecondaryActivitiesIds string `gorm:"column:secondaryActivitiesIds" json:"secondaryActivitiesIds"`
   Mei bool `gorm:"column:mei" json:"mei"`
   BranchOffice EnterpriseBranchOffice `gorm:"column:branchOffice" json:"branchOffice"`
-  // CreatedAt time.Time `gorm:"column:createdAt" json:"createdAt"`
+  CreatedAt time.Time `gorm:"column:createdAt" json:"createdAt"`
   FantasyName string `gorm:"column:fantasyName" json:"fantasyName"`
   Name string `gorm:"column:name" json:"name"`
   Enriched bool `gorm:"column:enriched" json:"enriched"`

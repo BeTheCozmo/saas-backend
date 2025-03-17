@@ -250,12 +250,6 @@ func (rs *RoleStorage) EnsureAdminRoleCreated() {
           RemainingUses: 0,
         },
         {
-          Name: "ent_get_details",
-          IsLimited: false,
-          RemainingUses: 0,
-        },
-
-        {
           Name: "ent_search_name",
           IsLimited: false,
           RemainingUses: 0,
@@ -302,6 +296,21 @@ func (rs *RoleStorage) EnsureAdminRoleCreated() {
         },
         {
           Name: "ent_search_details",
+          IsLimited: false,
+          RemainingUses: 0,
+        },
+        {
+          Name: "ent_details",
+          IsLimited: false,
+          RemainingUses: 0,
+        },
+        {
+          Name: "ent_history",
+          IsLimited: false,
+          RemainingUses: 0,
+        },
+        {
+          Name: "ent_get_createdAt",
           IsLimited: false,
           RemainingUses: 0,
         },
