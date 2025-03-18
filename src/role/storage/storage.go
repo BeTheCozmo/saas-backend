@@ -314,6 +314,11 @@ func (rs *RoleStorage) EnsureAdminRoleCreated() {
           IsLimited: false,
           RemainingUses: 0,
         },
+        {
+          Name: "ent_get_collectId",
+          IsLimited: false,
+          RemainingUses: 0,
+        },
       },
     })
     if err != nil {

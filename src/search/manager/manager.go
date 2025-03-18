@@ -34,13 +34,16 @@ func (sm *SearchManager) GetEnterpriseBaseByDocument(document string, u *u.User)
   if !pm.HavePermission(u, "ent_details") {
     return nil, errors.New("you do not have permission to access the details of enterprises")
   }
-  return sm.es.GetByDocument(document), nil
+  return sm.es.GetByDocument(document)
 }
 
 func (sm *SearchManager) GetEnterpriseBaseByDocumentMap(document string, u *u.User) (map[string]interface{}, error) {
   enterprise, err := sm.GetEnterpriseBaseByDocument(document, u)
   if err != nil {
     return nil, err
+  }
+  if enterprise == nil {
+    return nil, fmt.Errorf("enterprise doesn't exists")
   }
 
   permissions, err := pm.GetAllGrantedPermissionsAndNotExpired(u)

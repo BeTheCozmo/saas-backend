@@ -155,7 +155,7 @@ func (er *EnterpriseRoutes) getHistory(c *gin.Context) {
     c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
     return
   }
-  enterprises, err := er.sm.GetEnterpriseHistoryMap(document, 10, user)
+  enterprises, err := er.sm.GetEnterpriseHistoryMap(document, 20, user)
   if err != nil {
     c.AbortWithStatusJSON(http.StatusNotFound, err.Error())
     return

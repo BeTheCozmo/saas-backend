@@ -273,6 +273,11 @@ func (um *UserManager) getBasePermissions() []*p.Permission {
       IsLimited: false,
       RemainingUses: 0,
     },
+    {
+      Name: "ent_get_collectId",
+      IsLimited: false,
+      RemainingUses: 0,
+    },
   }
 }
 

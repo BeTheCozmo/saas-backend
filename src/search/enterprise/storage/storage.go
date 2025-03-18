@@ -26,10 +26,16 @@ func (es *EnterpriseStorage) Configure(db *gorm.DB) {
   es.pageSize = 10
 }
 
-func (es *EnterpriseStorage) GetByDocument(document string) *e.EnterpriseBase {
+func (es *EnterpriseStorage) GetByDocument(document string) (*e.EnterpriseBase, error) {
   var enterpriseBase e.EnterpriseBase
-  es.DB.Table(es.legalEntityBase).Where("document = ?", document).Take(&enterpriseBase)
-  return &enterpriseBase
+  err := es.DB.Table(es.legalEntityBase).Where("document = ?", document).Take(&enterpriseBase).Error
+  if err != nil {
+    if err == gorm.ErrRecordNotFound {
+      return nil, fmt.Errorf("enterprise with document %v not found", document)
+    }
+    return nil, err
+  }
+  return &enterpriseBase, nil
 }
 
 func (es *EnterpriseStorage) GetEnterpriseHistory(document string, limit uint16) *[]e.Enterprise {
